@@ -30,6 +30,16 @@ static bool read_array_from_file(const std::string& path, std::vector<int>& a) {
             return true;
 }
 
+static bool write_array_to_file(const std::string& path, const std::vector<int>& a) {
+            std::ofstream f(path);
+            if (!f) {
+                std::fprintf(stderr, "Cannot open for writing: %s\n", path.c_str());
+                return false;
+            }
+            for (int x : a) f << x << '\n';
+            return f.good();
+}
+
 static double now_sec(){
         using namespace std::chrono;
         return duration<double>(steady_clock::now().time_since_epoch()).count();
@@ -211,8 +221,13 @@ int main(int argc, char** argv) {
                 std::fprintf(stderr, "par: not sorted\n");
                 return EXIT_FAILURE;
         }
+        if(!write_array_to_file("result.txt", work)) {
+                std::fprintf(stderr, "Cannot write to file\n");
+                return EXIT_FAILURE;
+        }
         double S = T_seq / T_par;
         double X = S / threads;
+
 
         std::printf("Количество элементов в массиве: %d\n Максимальное количество потоков: %d\n", n, threads);
         std::printf("Время работы последовательной сортировки: %.6fсек\n", T_seq);
